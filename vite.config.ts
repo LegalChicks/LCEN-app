@@ -1,27 +1,15 @@
-import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
+// ✅ One default export only
 export default defineConfig(({ mode }) => {
-    const isProd = mode === 'production'
-    const env = loadEnv(mode, '.', '');
-    return {
-      base: isProd ? '/LCEN-app/' : '/', // <-- change to your repo name
-      server: {
-        port: 3000,
-        host: '0.0.0.0',
-      },
-      plugins: [react()],
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
-      resolve: {
-        alias: {
-          '@': path.resolve(__dirname, '.'),
-          build: {
+  const isProd = mode === 'production'
+
+  return {
+    base: isProd ? '/LCEN-app/' : '/',  // <-- change 'LCEN-app' if your repo name differs
+    plugins: [react()],
+    build: {
       outDir: 'dist',
-        }
-      }
-    };
-});
+    },
+  }
+})
