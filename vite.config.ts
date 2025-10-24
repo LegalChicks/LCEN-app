@@ -2,13 +2,9 @@ import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
-  base: '/LCEN-app/',  // e.g. '/LCEN-app/'
-  plugins: [react()],
-})
-
-
 export default defineConfig(({ mode }) => {
+
+  base: '/LCEN-app/',  // e.g. '/LCEN-app/'
     const env = loadEnv(mode, '.', '');
     return {
       server: {
