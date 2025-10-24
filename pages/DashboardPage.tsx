@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,6 +9,7 @@ const DashboardPage: React.FC = () => {
     { title: 'Our Services', description: 'Explore training, starter packs, and supplies.', path: '/services', icon: '🐣' },
     { title: 'Community Network', description: 'Connect with partners and view our reach.', path: '/community', icon: '🤝' },
     { title: 'AI Farming Assistant', description: 'Get expert advice on your poultry questions.', path: '/assistant', icon: '🤖' },
+    { title: 'Task Reminders', description: 'Set and manage your farming schedule.', path: '/reminders', icon: '🔔' },
   ];
 
   const impactGoals = [
@@ -31,7 +31,7 @@ const DashboardPage: React.FC = () => {
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         {/* Quick Links Section */}
         <h2 className="text-2xl font-bold text-text-dark mb-6">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickLinks.map((link) => (
             <Link key={link.title} to={link.path} className="block group">
               <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transform transition-all duration-300 border-t-4 border-secondary">

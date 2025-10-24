@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { getAssistantResponse } from '../services/geminiService';
 import { ChatMessage } from '../types';
@@ -20,27 +19,58 @@ const AssistantPage: React.FC = () => {
     scrollToBottom();
   }, [messages]);
   
+  // Load chat history from localStorage when the component mounts for a user.
   useEffect(() => {
-    setMessages([{ role: 'model', text: `Hi ${user?.name}! I'm your LCEN AI Assistant. How can I help you with your poultry farming today?` }]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!user) return;
+
+    const CHAT_HISTORY_KEY = `lcen-chat-history-${user.username}`;
+    try {
+      const savedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+      if (savedHistory) {
+        const parsedHistory = JSON.parse(savedHistory);
+        // Ensure the loaded history is a non-empty array before setting it
+        if (Array.isArray(parsedHistory) && parsedHistory.length > 0) {
+          // FIX: Cast the parsed history to ensure the 'role' property is correctly typed as 'user' | 'model' instead of the wider 'string' type. This prevents downstream type errors when creating new message arrays.
+          setMessages(parsedHistory as ChatMessage[]);
+          return;
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load or parse chat history from localStorage", e);
+      // If parsing fails, the data is likely corrupted, so we remove it.
+      localStorage.removeItem(CHAT_HISTORY_KEY);
+    }
+    
+    // If no history is found, set the initial welcome message.
+    setMessages([{ role: 'model', text: `Hi ${user.name}! I'm your LCEN AI Assistant. How can I help you with your poultry farming today?` }]);
+  }, [user]);
 
   const handleSend = async () => {
     if (!input.trim() || loading) return;
 
-    const newMessages: ChatMessage[] = [...messages, { role: 'user', text: input }];
-    setMessages(newMessages);
+    const userMessage: ChatMessage = { role: 'user', text: input };
+    const messagesWithUser = [...messages, userMessage];
+    setMessages(messagesWithUser);
     setInput('');
     setLoading(true);
     setError(null);
 
     try {
       const modelResponse = await getAssistantResponse(input);
-      setMessages([...newMessages, { role: 'model', text: modelResponse }]);
+      const finalMessages = [...messagesWithUser, { role: 'model', text: modelResponse }];
+      setMessages(finalMessages);
+
+      // After a successful response, save the entire chat history to localStorage.
+      if (user) {
+        const CHAT_HISTORY_KEY = `lcen-chat-history-${user.username}`;
+        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(finalMessages));
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
       setError(`Sorry, I couldn't get a response. Please try again. Error: ${errorMessage}`);
-      setMessages([...newMessages, { role: 'model', text: `I seem to be having trouble connecting. Please check your connection and try again.` }]);
+      // Even on error, update the UI to show a helpful message.
+      const messagesWithErr = [...messagesWithUser, { role: 'model', text: `I seem to be having trouble connecting. Please check your connection and try again.` }];
+      setMessages(messagesWithErr);
     } finally {
       setLoading(false);
     }

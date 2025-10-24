@@ -9,6 +9,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
 import UserProfilePage from './pages/UserProfilePage';
+import RemindersPage from './pages/RemindersPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -31,6 +32,7 @@ const App: React.FC = () => {
             <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
             <Route path="/assistant" element={<ProtectedRoute><AssistantPage /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/reminders" element={<ProtectedRoute><RemindersPage /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPage /></ProtectedRoute>} />
             <Route path="/users/:username" element={<ProtectedRoute><UserProfilePage /></ProtectedRoute>} />
 
