@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,10 +21,10 @@ const DashboardPage: React.FC = () => {
   ];
 
   return (
-    <div className="bg-light-bg min-h-full">
+    <div className="bg-light-bg min-h-full overflow-y-auto">
       <div className="bg-primary text-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-extrabold">Welcome, {user?.name}!</h1>
+          <h1 className="text-3xl font-extrabold md:text-4xl">Welcome, {user?.name}!</h1>
           <p className="mt-2 text-lg text-gray-200">This is your portal to the Legal Chicks Empowerment Network.</p>
         </div>
       </div>

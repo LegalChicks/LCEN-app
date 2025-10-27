@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -84,10 +85,10 @@ const UserProfilePage: React.FC = () => {
     // Admin view for editing other users
     if (isAdminViewer && !isOwnProfile) {
         return (
-            <div>
+            <div className="overflow-y-auto h-full">
                 <div className="bg-primary text-white py-12 px-4 sm:px-6 lg:px-8">
                     <div className="max-w-7xl mx-auto">
-                        <h1 className="text-4xl font-extrabold">Edit Member Profile</h1>
+                        <h1 className="text-3xl font-extrabold md:text-4xl">Edit Member Profile</h1>
                         <p className="mt-2 text-lg text-gray-200">Updating details for {userProfile.name}.</p>
                     </div>
                 </div>
@@ -130,10 +131,10 @@ const UserProfilePage: React.FC = () => {
 
     // Default read-only view for members
     return (
-        <div>
+        <div className="overflow-y-auto h-full">
             <div className="bg-primary text-white py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
-                    <h1 className="text-4xl font-extrabold">Member Profile</h1>
+                    <h1 className="text-3xl font-extrabold md:text-4xl">Member Profile</h1>
                     <p className="mt-2 text-lg text-gray-200">Viewing details for {userProfile.name}.</p>
                 </div>
             </div>

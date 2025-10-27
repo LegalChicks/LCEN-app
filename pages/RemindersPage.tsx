@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { CheckIcon } from '../components/icons/CheckIcon';
@@ -73,10 +74,10 @@ const RemindersPage: React.FC = () => {
   const inputClass = "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-secondary focus:border-secondary sm:text-sm";
 
   return (
-    <div>
+    <div className="overflow-y-auto h-full">
       <div className="bg-primary text-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-extrabold">Task Reminders</h1>
+          <h1 className="text-3xl font-extrabold md:text-4xl">Task Reminders</h1>
           <p className="mt-2 text-lg text-gray-200">Stay organized and on top of your farming schedule.</p>
         </div>
       </div>

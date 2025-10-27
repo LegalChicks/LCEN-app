@@ -20,10 +20,10 @@ const coreValues = [
 
 const CommunityPage: React.FC = () => {
   return (
-    <div>
+    <div className="overflow-y-auto h-full">
       <div className="bg-primary text-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-extrabold">Our Community</h1>
+          <h1 className="text-3xl font-extrabold md:text-4xl">Our Community</h1>
           <p className="mt-2 text-lg text-gray-200">We rise together. Farmers, families, and partners are one.</p>
         </div>
       </div>

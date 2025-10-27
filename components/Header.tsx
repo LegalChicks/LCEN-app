@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -6,6 +7,8 @@ import { UserIcon } from './icons/UserIcon';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
 import { BellIcon } from './icons/BellIcon';
 import { Reminder } from '../types';
+import { MenuIcon } from './icons/MenuIcon';
+import { CloseIcon } from './icons/CloseIcon';
 
 
 const Header: React.FC = () => {
@@ -13,6 +16,7 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dueReminders, setDueReminders] = useState<Reminder[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationRef = useRef<HTMLDivElement>(null);
@@ -22,7 +26,6 @@ const Header: React.FC = () => {
     navigate('/login');
   };
   
-  // Check for due reminders periodically
   useEffect(() => {
     if (!user || !getReminders) return;
 
@@ -33,13 +36,12 @@ const Header: React.FC = () => {
         setDueReminders(due);
     };
 
-    checkReminders(); // Initial check
-    const intervalId = setInterval(checkReminders, 60000); // Check every minute
+    checkReminders();
+    const intervalId = setInterval(checkReminders, 60000); 
 
     return () => clearInterval(intervalId);
   }, [user, getReminders]);
 
-  // Close dropdowns if clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -60,6 +62,13 @@ const Header: React.FC = () => {
         ? 'bg-accent text-primary'
         : 'text-text-light hover:bg-primary/50'
     }`;
+    
+  const mobileNavLinkClasses = ({ isActive }: { isActive: boolean }) =>
+    `block rounded-lg py-2 px-3 text-base font-semibold leading-7 transition-colors ${
+      isActive
+        ? 'bg-accent text-primary'
+        : 'text-text-light hover:bg-primary/50'
+    }`;
 
   return (
     <header className="bg-primary shadow-md sticky top-0 z-50">
@@ -67,7 +76,7 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-                <Link to="/">
+                <Link to="/" onClick={() => setMobileMenuOpen(false)}>
                     <LogoIcon className="h-10 w-10 text-accent" />
                 </Link>
             </div>
@@ -77,6 +86,7 @@ const Header: React.FC = () => {
                 <NavLink to="/services" className={navLinkClasses}>Services</NavLink>
                 <NavLink to="/community" className={navLinkClasses}>Community</NavLink>
                 <NavLink to="/assistant" className={navLinkClasses}>AI Assistant</NavLink>
+                <NavLink to="/marketplace" className={navLinkClasses}>Marketplace</NavLink>
                 <NavLink to="/reminders" className={navLinkClasses}>Reminders</NavLink>
                 {user?.role === 'admin' && (
                     <NavLink to="/admin" className={navLinkClasses}>Admin</NavLink>
@@ -143,9 +153,56 @@ const Header: React.FC = () => {
                     </div>
                 )}
              </div>
+              <div className="ml-2 md:hidden">
+                <button
+                  onClick={() => setMobileMenuOpen(true)}
+                  className="inline-flex items-center justify-center p-2 rounded-md text-text-light hover:bg-primary/50 focus:outline-none"
+                  aria-controls="mobile-menu"
+                  aria-expanded={mobileMenuOpen}
+                >
+                  <span className="sr-only">Open main menu</span>
+                  <MenuIcon className="block h-6 w-6" aria-hidden="true" />
+                </button>
+              </div>
           </div>
         </div>
       </div>
+
+       {mobileMenuOpen && (
+        <div className="md:hidden" id="mobile-menu">
+            <div className="fixed inset-0 bg-black bg-opacity-75 z-50" aria-hidden="true" onClick={() => setMobileMenuOpen(false)}></div>
+            <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-primary px-6 py-6 sm:max-w-sm">
+            <div className="flex items-center justify-between">
+                <Link to="/" onClick={() => setMobileMenuOpen(false)}>
+                    <LogoIcon className="h-10 w-10 text-accent" />
+                </Link>
+                <button
+                type="button"
+                className="-m-2.5 rounded-md p-2.5 text-text-light"
+                onClick={() => setMobileMenuOpen(false)}
+                >
+                <span className="sr-only">Close menu</span>
+                <CloseIcon className="h-6 w-6" aria-hidden="true" />
+                </button>
+            </div>
+            <div className="mt-6 flow-root">
+                <div className="-my-6 divide-y divide-primary/20">
+                    <div className="space-y-2 py-6">
+                        <NavLink to="/" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>Dashboard</NavLink>
+                        <NavLink to="/services" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>Services</NavLink>
+                        <NavLink to="/community" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>Community</NavLink>
+                        <NavLink to="/assistant" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>AI Assistant</NavLink>
+                        <NavLink to="/marketplace" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>Marketplace</NavLink>
+                        <NavLink to="/reminders" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>Reminders</NavLink>
+                        {user?.role === 'admin' && (
+                            <NavLink to="/admin" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>Admin</NavLink>
+                        )}
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+      )}
     </header>
   );
 };

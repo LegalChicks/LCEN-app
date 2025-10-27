@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 const SYSTEM_INSTRUCTION = `You are an expert poultry farming assistant for members of the Legal Chicks Empowerment Network (LCEN) in Cagayan Valley, Philippines. 
@@ -14,7 +13,7 @@ Your expertise includes:
 
 When answering, be clear, concise, and provide actionable steps. Always prioritize the well-being of the poultry and the success of the farmer. Do not provide medical advice for humans.`;
 
-export const getAssistantResponse = async (prompt: string): Promise<string> => {
+export const getAssistantResponse = async (prompt: string): Promise<{ text: string; sources: { uri: string; title: string }[] }> => {
   if (!process.env.API_KEY) {
     throw new Error("API_KEY environment variable not set.");
   }
@@ -29,17 +28,26 @@ export const getAssistantResponse = async (prompt: string): Promise<string> => {
             systemInstruction: SYSTEM_INSTRUCTION,
             temperature: 0.7,
             topP: 0.95,
-            topK: 64
+            topK: 64,
+            tools: [{googleSearch: {}}],
         }
     });
 
-    // FIX: Added a fallback to ensure a string is always returned, preventing potential runtime errors if response.text is nullish.
-    return response.text ?? "Sorry, I could not generate a response. Please try again.";
+    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [];
+    const sources = groundingChunks
+        .map(chunk => chunk.web)
+        .filter((web): web is { uri: string, title: string } => !!(web?.uri && web.title))
+        .map(web => ({ uri: web.uri, title: web.title }));
+
+    return {
+        text: response.text ?? "Sorry, I could not generate a response. Please try again.",
+        sources: sources,
+    };
   } catch (error) {
     console.error("Gemini API call failed:", error);
     if (error instanceof Error) {
-        return `Failed to get response from AI model. Details: ${error.message}`;
+        throw new Error(`Failed to get response from AI model. Details: ${error.message}`);
     }
-    return "An unknown error occurred while contacting the AI model.";
+    throw new Error("An unknown error occurred while contacting the AI model.");
   }
 };

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { LogoIcon } from '../components/icons/LogoIcon';
@@ -9,8 +9,15 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [currentDate, setCurrentDate] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const today = new Date();
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    setCurrentDate(today.toLocaleDateString('en-US', options));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,13 +45,10 @@ const LoginPage: React.FC = () => {
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
             LCEN Member Portal
           </h2>
+          <p className="mt-2 text-sm text-gray-500">{currentDate}</p>
           <p className="mt-2 text-sm text-gray-600">
-            Sign in to access your resources.
+            Welcome back! Please sign in to continue.
           </p>
-          <div className="mt-4 text-xs text-gray-500 bg-gray-100 p-2 rounded">
-            <p><strong>Member:</strong> `farmer_juan` / `password123`</p>
-            <p><strong>Admin:</strong> `admin` / `adminpassword`</p>
-          </div>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
