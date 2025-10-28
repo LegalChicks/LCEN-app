@@ -110,7 +110,6 @@ const AdminPage: React.FC = () => {
 
   const handleSendMessage = () => {
     // In a real app, this would call an API.
-    console.log(`Sending message to ${selectedUserIds.size} users: "${messageContent}"`);
     showFeedback('success', `Message sent to ${selectedUserIds.size} members.`);
     setIsMessageModalOpen(false);
     setMessageContent('');

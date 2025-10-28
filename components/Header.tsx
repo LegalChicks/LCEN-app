@@ -88,6 +88,7 @@ const Header: React.FC = () => {
                 <NavLink to="/assistant" className={navLinkClasses}>AI Assistant</NavLink>
                 <NavLink to="/marketplace" className={navLinkClasses}>Marketplace</NavLink>
                 <NavLink to="/reminders" className={navLinkClasses}>Reminders</NavLink>
+                <NavLink to="/billing" className={navLinkClasses}>Billing</NavLink>
                 {user?.role === 'admin' && (
                     <NavLink to="/admin" className={navLinkClasses}>Admin</NavLink>
                 )}
@@ -194,6 +195,7 @@ const Header: React.FC = () => {
                         <NavLink to="/assistant" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>AI Assistant</NavLink>
                         <NavLink to="/marketplace" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>Marketplace</NavLink>
                         <NavLink to="/reminders" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>Reminders</NavLink>
+                        <NavLink to="/billing" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>Billing</NavLink>
                         {user?.role === 'admin' && (
                             <NavLink to="/admin" className={mobileNavLinkClasses} onClick={() => setMobileMenuOpen(false)}>Admin</NavLink>
                         )}

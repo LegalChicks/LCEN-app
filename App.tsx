@@ -17,6 +17,7 @@ import Footer from './components/Footer';
 import { useAuth } from './contexts/AuthContext';
 import MarketplacePage from './pages/MarketplacePage';
 import MemberDetailsPage from './pages/MemberDetailsPage';
+import BillingPage from './pages/BillingPage';
 
 const App: React.FC = () => {
   const { user } = useAuth();
@@ -37,6 +38,7 @@ const App: React.FC = () => {
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/reminders" element={<ProtectedRoute><RemindersPage /></ProtectedRoute>} />
             <Route path="/marketplace" element={<ProtectedRoute><MarketplacePage /></ProtectedRoute>} />
+            <Route path="/billing" element={<ProtectedRoute><BillingPage /></ProtectedRoute>} />
 
             {/* Admin Routes */}
             <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPage /></ProtectedRoute>} />

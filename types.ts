@@ -1,4 +1,3 @@
-// FIX: Define User and ChatMessage types to be used across the application.
 export interface User {
   id: number;
   username: string;

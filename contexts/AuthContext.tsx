@@ -3,6 +3,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, AuditLogEntry, Reminder, OpportunityPackage, TrainingSession, FeedOrder, MarketStock, MarketStockType, ChatSession, ChatMessage } from '../types';
 
+// =================================================================================================
+// IMPORTANT: MOCK DATABASE & AUTHENTICATION
+// This file uses mock data stored in localStorage for demonstration purposes.
+// In a real-world application, NEVER store plain-text passwords.
+// This entire file should be replaced with a secure backend authentication and database service.
+// =================================================================================================
 // This is the initial mock database. Data will be persisted in localStorage.
 const MOCK_USERS_INITIAL: (User & { password?: string })[] = [
   { 
@@ -309,12 +315,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const forgotPassword = async (email: string): Promise<void> => {
      // In a real app, this would trigger a backend service to send an email.
-    console.log(`Password reset requested for email: ${email}`);
-    // If it's the admin's email, "notify" the backup.
-    const adminUser = users.find(u => u.role === 'admin');
-    if(adminUser?.email === email) {
-        console.log(`Admin password reset requested. Notifying backup email: ${ADMIN_BACKUP_EMAIL}`);
-    }
     return Promise.resolve();
   };
   
@@ -339,23 +339,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 const logMessage = `Updated their profile: ${changes.join(', ')}.`;
                 logActivity(user.username, 'UPDATE_USER', logMessage);
                 
-                // Simulate sending emails
-                console.log(`--- SIMULATING EMAIL ---
-                To: ${data.email}
-                Subject: Your LCEN Profile Has Been Updated
-                Body: Hi ${data.name}, this is to confirm that your profile details have been successfully updated.
-                --- END EMAIL ---`);
-                
                 if (actingAdmin) {
                     // This case is handled in adminUpdateUser, but added for completeness if an admin uses their own profile page.
                      const adminUser = users.find(u => u.role === 'admin');
-                     if (adminUser && adminUser.email !== user.email) {
-                        console.log(`--- SIMULATING EMAIL ---
-                        To: ${adminUser.email}
-                        Subject: [Admin Alert] Member Profile Updated
-                        Body: Member ${data.name} (${user.username}) has updated their profile. Details: ${changes.join(', ')}.
-                        --- END EMAIL ---`);
-                     }
                 }
 
               }
@@ -494,21 +480,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 if (changes.length > 0) {
                   logAdminAction('UPDATE_USER', logMessage);
                   
-                  // Notify member of the change
-                  console.log(`--- SIMULATING EMAIL ---
-                  To: ${data.email}
-                  Subject: Your LCEN Profile Has Been Updated by an Administrator
-                  Body: Hi ${data.name}, an administrator has updated your profile. Details: ${changes.join(', ')}.
-                  --- END EMAIL ---`);
-
-                  // Confirm action to the admin
-                  if (user.email) {
-                    console.log(`--- SIMULATING EMAIL ---
-                    To: ${user.email}
-                    Subject: [Admin Action] You Updated a Member's Profile
-                    Body: You have successfully updated the profile for ${originalUser.username}. Details: ${changes.join(', ')}.
-                    --- END EMAIL ---`);
-                  }
                 }
                 const { password: _p, ...updatedUser } = newUsers[userIndex];
                 updatedUserForReturn = updatedUser;
