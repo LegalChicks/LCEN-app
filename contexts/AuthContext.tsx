@@ -320,12 +320,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   
   const updateUserProfile = async (data: { name: string, email: string }): Promise<void> => {
       if (!user) throw new Error("Not authenticated");
+
+      // Check for email duplication before attempting to set state.
+      const emailExists = users.some(u => u.email.toLowerCase() === data.email.toLowerCase() && u.id !== user.id);
+      if (emailExists) {
+          throw new Error("Email is already in use by another account.");
+      }
       
       setUsers(prevUsers => {
           const userIndex = prevUsers.findIndex(u => u.id === user.id);
           if (userIndex > -1) {
               const originalUser = prevUsers[userIndex];
-              const actingAdmin = users.find(u => u.id === user.id && u.role === 'admin');
               
               let changes: string[] = [];
               if (originalUser.name !== data.name) {
@@ -338,22 +343,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               if (changes.length > 0) {
                 const logMessage = `Updated their profile: ${changes.join(', ')}.`;
                 logActivity(user.username, 'UPDATE_USER', logMessage);
-                
-                if (actingAdmin) {
-                    // This case is handled in adminUpdateUser, but added for completeness if an admin uses their own profile page.
-                     const adminUser = users.find(u => u.role === 'admin');
-                }
-
               }
               
               const newUsers = [...prevUsers];
               newUsers[userIndex] = { ...newUsers[userIndex], ...data };
-              const updatedUser = { ...user, ...data };
-              setUser(updatedUser);
-              localStorage.setItem('lcen-user', JSON.stringify(updatedUser));
+              
+              const updatedUserForState = { ...user, ...data };
+              setUser(updatedUserForState);
+              localStorage.setItem('lcen-user', JSON.stringify(updatedUserForState));
+              
               return newUsers;
           }
-          throw new Error("User not found in mock database.");
+          return prevUsers;
       });
   };
   

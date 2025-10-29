@@ -4,11 +4,12 @@ import { User } from '../types';
 import MemberCard from '../components/MemberCard';
 import { ExportIcon } from '../components/icons/ExportIcon';
 import { SendIcon } from '../components/icons/SendIcon';
+import { UserPlusIcon } from '../components/icons/UserPlusIcon';
 
 type SortKey = 'name' | 'registrationDate' | 'lastActivityDate' | 'estimatedProfit';
 
 const AdminPage: React.FC = () => {
-  const { getAllUsers, user: currentUser } = useAuth();
+  const { getAllUsers, user: currentUser, registerUser } = useAuth();
   
   const [userList, setUserList] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,6 +26,16 @@ const AdminPage: React.FC = () => {
   const [messageContent, setMessageContent] = useState('');
   
   const [feedbackMessage, setFeedbackMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  // Registration Modal State
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [regName, setRegName] = useState('');
+  const [regUsername, setRegUsername] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('');
+  const [regLoading, setRegLoading] = useState(false);
+  const [regError, setRegError] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (getAllUsers) {
@@ -116,6 +127,32 @@ const AdminPage: React.FC = () => {
     setSelectedUserIds(new Set());
   };
 
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!registerUser) return;
+
+    setRegLoading(true);
+    setRegError(null);
+    try {
+        await registerUser({ name: regName, username: regUsername, email: regEmail, password: regPassword });
+        showFeedback('success', `Member ${regUsername} registered successfully.`);
+        setIsRegisterModalOpen(false);
+        // Clear form
+        setRegName('');
+        setRegUsername('');
+        setRegEmail('');
+        setRegPassword('');
+        // Refresh user list
+        if (getAllUsers) {
+            setUserList(getAllUsers());
+        }
+    } catch (error) {
+        setRegError(error instanceof Error ? error.message : "An unknown error occurred during registration.");
+    } finally {
+        setRegLoading(false);
+    }
+  };
+
   const exportToCSV = (usersToExport: User[]) => {
     if(usersToExport.length === 0) {
         showFeedback('error', 'No members to export.');
@@ -155,8 +192,19 @@ const AdminPage: React.FC = () => {
     <div className="overflow-y-auto h-full">
       <div className="bg-primary text-white py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-extrabold md:text-4xl">Member Management Dashboard</h1>
-          <p className="mt-2 text-lg text-gray-200">Oversee, manage, and engage with all LCEN members.</p>
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+              <div>
+                  <h1 className="text-3xl font-extrabold md:text-4xl">Member Management Dashboard</h1>
+                  <p className="mt-2 text-lg text-gray-200">Oversee, manage, and engage with all LCEN members.</p>
+              </div>
+              <button 
+                  onClick={() => setIsRegisterModalOpen(true)} 
+                  className="flex-shrink-0 flex items-center justify-center space-x-2 bg-accent text-primary font-bold py-2 px-4 rounded-md hover:bg-opacity-80 transition-colors"
+              >
+                  <UserPlusIcon className="h-5 w-5"/>
+                  <span>Register New Member</span>
+              </button>
+          </div>
         </div>
       </div>
 
@@ -249,6 +297,43 @@ const AdminPage: React.FC = () => {
         </div>
       )}
       
+      {isRegisterModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center p-4">
+            <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+                <h3 className="text-lg font-bold text-primary mb-4">Register New Member</h3>
+                <form onSubmit={handleRegisterSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input type="text" value={regName} onChange={e => setRegName(e.target.value)} required className={inputClass} />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Username</label>
+                        <input type="text" value={regUsername} onChange={e => setRegUsername(e.target.value)} required className={inputClass} />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Email Address</label>
+                        <input type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} required className={inputClass} />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)} required className={inputClass} />
+                    </div>
+
+                    {regError && (
+                      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md text-center text-sm" role="alert">
+                          <p>{regError}</p>
+                      </div>
+                    )}
+                    
+                    <div className="pt-2 flex justify-end space-x-3">
+                        <button type="button" onClick={() => setIsRegisterModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">Cancel</button>
+                        <button type="submit" disabled={regLoading} className="px-4 py-2 text-sm font-medium text-white bg-secondary border border-transparent rounded-md hover:bg-accent hover:text-primary disabled:bg-gray-400">{regLoading ? 'Registering...' : 'Register Member'}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+      )}
+
       {feedbackMessage && (
         <div className={`fixed bottom-5 right-5 text-white px-6 py-3 rounded-lg shadow-lg z-50 ${feedbackMessage.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
             {feedbackMessage.text}
